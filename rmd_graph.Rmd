@@ -6,6 +6,22 @@ date: "2022-08-24"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(janitor)
+library(here)
+
+q1 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca1-Bisley.csv"), na = "-9999") %>%
+  clean_names()
+
+q2 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca2-Bisley.csv"), na = "-9999") %>%
+  clean_names()
+
+q3 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca3-Bisley.csv"), na = "-9999") %>%
+  clean_names()
+
+prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "RioMameyesPuenteRoto.csv"), na = "-9999") %>%
+  clean_names()
 ```
 
 
@@ -56,6 +72,36 @@ all_sites <- full_join(prm, q1) %>%
 # Wade Code Chunk
 
 ```{r}
+
+# Changing class of date to dateTime
+
+q1_ws <- q1 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_date, sample_time, no3_n, k, year, month)
+
+q2_ws <- q2 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_date, sample_time, no3_n, k, year, month)
+
+
+q3_ws <- q3 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>%
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_date, sample_time, no3_n, k, year, month)
+
+
+prm_ws <- prm %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_date, sample_time, no3_n, k, year, month)
+
+
 
 ```
 
