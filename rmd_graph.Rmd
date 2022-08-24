@@ -38,6 +38,41 @@ prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "Ri
 
 ```{r}
 
+q1_eg <- q1 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+q2_eg <- q2 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+
+q3_eg <- q3 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>%
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+
+prm_eg <- prm %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+join1 <- full_join(q1_eg, q2_eg)
+join2 <- full_join(join1, q3_eg)
+all_sites <- full_join(join2, prm_eg) |> 
+  mutate(no3_n = as.numeric(no3_n))
+  
+summary_all <- all_sites |> group_by(sample_id, month, year, na.rm = TRUE) |> summarize(mean_no3_n = mean(no3_n))
+
+ggplot(data = summary_all, aes(x = year, y = mean_no3_n)) +
+  geom_line(aes(color = sample_id))
 ```
 
 
