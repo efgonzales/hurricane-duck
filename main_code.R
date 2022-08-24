@@ -7,20 +7,14 @@ library(janitor)
 q1 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca1-Bisley.csv"), na = "-9999") %>%
   clean_names()
 
-%>%
-  mutate(sample_date = lubridate::mdy(sample_date))
-
 q2 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca2-Bisley.csv"), na = "-9999") %>%
-  clean_names() %>%
-  mutate(sample_date = lubridate::mdy(sample_date))
+  clean_names()
 
 q3 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca3-Bisley.csv"), na = "-9999") %>%
-  clean_names() %>%
-  mutate(sample_date = lubridate::mdy(sample_date))
+  clean_names()
 
 prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "RioMameyesPuenteRoto.csv"), na = "-9999") %>%
-  clean_names() %>%
-  mutate(sample_date = lubridate::mdy(sample_date))
+  clean_names()
 
 
 
