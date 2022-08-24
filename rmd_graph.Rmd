@@ -1,0 +1,54 @@
+---
+title: "code"
+output: html_document
+date: "2022-08-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Ata Code Chunk
+
+```{r}
+
+```
+
+
+
+# Elise Code Chunk
+
+```{r}
+
+```
+
+
+
+# Lewis Code Chunk
+
+```{r}
+
+```
+
+
+
+# Victoria Code Chunk
+
+```{r}
+
+```
+
+
+
+# Wade Code Chunk
+
+```{r}
+
+```
+
+
+
+
+
