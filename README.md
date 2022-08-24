@@ -1,2 +1,2 @@
 # hurricane-duck
-EDS214-Group-Project
+EDS214 Group Project
