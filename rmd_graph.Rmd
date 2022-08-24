@@ -38,6 +38,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 
+library(tidyverse)
+# wrangle data
+
+  # join all sites
+
+all_sites <- full_join(prm, q1) %>% 
+  full_join(q2) %>% 
+  full_join(q3)
+
+# plot data 
+
 ```
 
 
