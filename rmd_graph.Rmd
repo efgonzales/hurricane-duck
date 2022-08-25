@@ -132,7 +132,16 @@ ggplot(data = all_sites_select_years, aes(x = sample_date, y = k)) +
 
 
 
+<<<<<<< HEAD
+no3_n_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_no3_n)) +
+  geom_line(aes(color = sample_id)) +
+  labs(x = "Mean K () per Month",
+       y = )
+#+
+  #facet_wrap(vars(measurement_type), scales = "free")
+=======
 ```
+>>>>>>> b44332e56746a8cb73efef55902d4a9ac5a553e5
 
 
 
