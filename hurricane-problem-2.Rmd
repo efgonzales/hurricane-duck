@@ -58,131 +58,23 @@ lef_table <- bind_rows(bq1, bq2, bq3, prm) %>%
 ```{r}
 
 lef_table_subset_sept <- lef_table %>%
-  filter(str_ym_date > '1989-8-01' & str_ym_date < '1990-10-01') 
+  filter(str_ym_date > '1988-8-01' & str_ym_date < '1990-10-01') 
   
 graph_data <- lef_table_subset_sept %>%
-  group_by(str_ym_date) %>%
+  group_by(str_ym_date, site) %>%
   summarise(mean_k = mean(k, na.rm = TRUE),
             mean_no_3 = mean(no3_n, na.rm = TRUE))
 
 
+
 ggplot(data = graph_data, aes(x = str_ym_date, y = mean_k)) + 
-  geom_bar()
+  geom_col() +
+  facet_wrap(~site) +
+  labs(x = "Date",
+       y = "Mean Potassium (K) in mg/L",
+       title = "Mean Potassium levels from September 1988 to 1990",
+       subtitle = "Potassium spiked sharply during Hurricane Hugo, fell in the following month, rose back up to elevated levels, and then slowly started to return to baseline") + 
+  theme(panel.background = element_rect(fill = "white"))
 ```
-
-
-
-all_sites_select_years <- full_join(q1_tidy, q2_tidy) |> 
-  full_join(q3_tidy) |> 
-  full_join(prm_tidy) |> 
-  filter(year >= 1987,
-         year <= 1995)
-
-all_sites_select_years |> 
-  unite()
-
-
-all_sites_select_years |> 
-  group_by(month, year, sample_id) |> 
-  summarize(mean_k = mean(k, na.rm = TRUE))
-
-
-
-
-ggplot(data = all_sites_select_years, aes(x = sample_date, y = k)) +
-  geom_line(aes(color = sample_id))
-
-
-
-
-ggplot(data = ___, aes(x = ym, y = k)) +
-  geom_bar() +
-  facet_grid(~site)
-```
-
-
-
-# Victoria Code Chunk
-
-```{r}
-
-```
-
-
-
-# Wade Code Chunk
-
-```{r}
-
-# Changing class of date to dateTime
-
-q1_ws <- q1 %>% 
-  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
-  mutate(year = lubridate::year(sample_date)) %>% 
-  mutate(month = lubridate::month(sample_date)) %>% 
-  mutate(k = as.numeric(k)) %>%
-  mutate(no3_n = as.numeric(no3_n)) %>%
-  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
-
-q2_ws <- q2 %>% 
-  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
-  mutate(year = lubridate::year(sample_date)) %>% 
-  mutate(month = lubridate::month(sample_date)) %>% 
-  mutate(k = as.numeric(k)) %>%
-  mutate(no3_n = as.numeric(no3_n)) %>%
-  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
-
-
-q3_ws <- q3 %>% 
-  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
-  mutate(year = lubridate::year(sample_date)) %>%
-  mutate(month = lubridate::month(sample_date)) %>% 
-  mutate(k = as.numeric(k)) %>%
-  mutate(no3_n = as.numeric(no3_n)) %>%
-  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
-
-
-prm_ws <- prm %>% 
-  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
-  mutate(year = lubridate::year(sample_date)) %>% 
-  mutate(month = lubridate::month(sample_date)) %>% 
-  mutate(k = as.numeric(k)) %>%
-  mutate(no3_n = as.numeric(no3_n)) %>%
-  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
-
-
-joined_data <- q1_ws %>% 
-  full_join(q2_ws) %>% 
-  full_join(q3_ws) %>% 
-  full_join(prm_ws)
-
-summarised_data <- joined_data %>% 
-  group_by(sample_id, year) %>% 
-  summarise(mean_no3 = mean(no3_n, na.rm = TRUE),
-            mean_k = mean(k, na.rm = TRUE))
-
-
-no3 <- ggplot(data = summarised_data, aes(x = year, y = mean_no3)) +
-  geom_line(aes(color = sample_id)) +
-  geom_vline(xintercept = (1989))
-
-k <- ggplot(data = summarised_data, aes(x = year, y = mean_k)) +
-  geom_line(aes(color = sample_id)) +
-  geom_vline(xintercept = (1989))
-
-
-
-joined_sites_mean <- joined_data %>% 
-  group_by(sample_id, year) %>% 
-  summarize(mean_k = mean(k, na.rm = TRUE),
-            mean_no3 = mean(no3_n, na.rm = TRUE))
-
-
-
-
-(no3 / k)
-
-```
-
 
 
