@@ -1,0 +1,18 @@
+Version: 1.0
+
+RestoreWorkspace: Default
+SaveWorkspace: Default
+AlwaysSaveHistory: Default
+
+EnableCodeIndexing: Yes
+UseSpacesForTab: Yes
+NumSpacesForTab: 2
+Encoding: UTF-8
+
+RnwWeave: Sweave
+LaTeX: pdfLaTeX
+<<<<<<< HEAD
+=======
+
+AutoAppendNewline: Yes
+StripTrailingWhitespace: Y>>>>>>> d33ccc86f5827f8e2d86956a5af990ff6c752ee3
