@@ -65,9 +65,9 @@ all_sites <- full_join(prm, q1) %>% full_join(q2) %>% full_join(q3) %>%
   filter(year >= 1988 & year <= 1995) %>% 
   mutate(k = as.numeric(k)) %>% 
   mutate(no3_n = as.numeric(no3_n)) %>% 
-  #mutate(month_year = lubridate::)
+  #mutate(month_year = lubridate::my)
   pivot_longer('no3_n':'k', names_to = "measurement_type", values_to = "measurement_value") %>% 
-  group_by(sample_id, sample_date, measurement_type) %>% summarize(mean_val = mean(measurement_value, na.rm = TRUE))
+  group_by(sample_id, month, year, measurement_type) %>% summarize(mean_val = mean(measurement_value, na.rm = TRUE))
 
   #mutate(yearmonth = lubridate::ym(sample_date)) %>% 
   #
