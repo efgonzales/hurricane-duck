@@ -59,14 +59,20 @@ all_sites <- full_join(prm, q1) %>% full_join(q2) %>% full_join(q3) %>% # full j
 no3_n_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_no3_n)) +
   geom_line(aes(color = sample_id)) +
   labs(x = "Year",
-       y = "Mean K (mg I-1) per Month") + 
-  scale_color_discrete(name="")
+       y = "Mean K (mg/L) per Month") + 
+  scale_color_discrete(name="Site Name") +
+  geom_vline(xintercept = lubridate::ymd("1989-09-01"), linetype="dotted") + # add a dotted line when the hurricane was (days are all "01")
+  geom_text(aes(x=lubridate::ymd("1989-07-01"), label="Hurricane Hugo", y=0), color="black", size = 3)
+  
 
 k_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_k)) +
   geom_line(aes(color = sample_id)) +
   labs(x = "Year",
-       y = "Mean NO3-N (ug I-1) per Month") + 
-  scale_color_discrete(name="")
+       y = "Mean NO3-N (ug/L) per Month",
+      title = "The Effect of Hurricane Hugo on Mean K and NO3-N (ug/L) levels") + 
+  scale_color_discrete(name="Site Name") +
+  geom_vline(xintercept = lubridate::ymd("1989-09-01"), linetype="dotted") +
+  geom_text(aes(x=lubridate::ymd("1989-07-01"), label="Hurricane Hugo", y=0), color="black", size = 3)
 
 (k_plot / no3_n_plot)
 ```
