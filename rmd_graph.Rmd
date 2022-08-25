@@ -38,7 +38,7 @@ prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "Ri
 # Elise Code Chunk
 
 ```{r}
-
+library(zoo)
 q1_eg <- q1 %>% 
   mutate(sample_date = lubridate::ymd(sample_date)) %>% 
   mutate(year = lubridate::year(sample_date)) %>% 
@@ -70,10 +70,11 @@ join2 <- full_join(join1, q3_eg)
 all_sites <- full_join(join2, prm_eg) |> 
   mutate(no3_n = as.numeric(no3_n))
   
-summary_all <- all_sites |> group_by(sample_id, month, year, na.rm = TRUE) |> summarize(mean_no3_n = mean(no3_n))
+summary_all <- all_sites |> group_by(sample_id, month, year, na.rm = TRUE) |> summarize(mean_no3_n = mean(no3_n)) |> 
+  mutate(date = as.yearmon(paste(summary_all$year, summary_all$month, "%Y %m")))
 
 ggplot(data = summary_all, aes(x = year, y = mean_no3_n)) +
-  geom_line(aes(color = sample_id))
+  geom_line(aes(line = sample_id))
 ```
 
 
