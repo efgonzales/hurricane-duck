@@ -1,0 +1,72 @@
+---
+title: "Recreating The Plot"
+author: "Victoria, Elise, Ata, Wade, Lewis"
+date: "2022-08-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+library(patchwork)
+library(janitor)
+library(here)
+```
+
+## Read in the Data
+
+```{r}
+
+# site BQ1
+q1 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca1-Bisley.csv"), na = "-9999") %>%
+  clean_names()
+
+# site BQ2
+q2 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca2-Bisley.csv"), na = "-9999") %>%
+  clean_names()
+
+# site BQ3
+q3 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca3-Bisley.csv"), na = "-9999") %>%
+  clean_names()
+
+#site PRM
+prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "RioMameyesPuenteRoto.csv"), na = "-9999") %>%
+  clean_names()
+```
+
+## Wrangle the Data for Plotting
+
+```{r}
+all_sites <- full_join(prm, q1) %>% full_join(q2) %>% full_join(q3) %>% # full join the data for each site to keep all data for all sites
+  select(sample_id, sample_date, sample_time, no3_n, k) %>% # select only the columns we need to make things more simple
+  mutate(year = lubridate::year(sample_date)) %>%  #let's isolate the year for our graph since we will end up needing a "year month" column for graphing and need the year for filtering to match the plot timespan
+  mutate(month = lubridate::month(sample_date)) %>% #let's also isolate the month since we will end up needing a "year month" column
+  mutate(str_my = paste(year, month)) %>% # step one of creating a year_month column
+  mutate(str_ym_date = lubridate::ym(str_my)) %>% # final step of creating a year month column
+  filter(year >= 1988 & year <= 1995) %>% # filter for these years to match the plot
+  mutate(k = as.numeric(k)) %>% # make K numeric so that we can plot
+  mutate(no3_n = as.numeric(no3_n)) %>% # make NO3 numeric so that we can plot
+  group_by(sample_id, str_ym_date) %>% 
+  summarize(mean_no3_n = mean(no3_n, na.rm = TRUE),
+            mean_k = mean(k, na.rm = TRUE))  # let's get the mean measurement values by year month for each site
+```
+
+## Plot the Data
+
+```{r}
+
+no3_n_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_no3_n)) +
+  geom_line(aes(color = sample_id)) +
+  labs(x = "Year",
+       y = "Mean K (mg I-1) per Month") + 
+  scale_color_discrete(name="")
+
+k_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_k)) +
+  geom_line(aes(color = sample_id)) +
+  labs(x = "Year",
+       y = "Mean NO3-N (ug I-1) per Month") + 
+  scale_color_discrete(name="")
+
+(k_plot / no3_n_plot)
+```
