@@ -82,7 +82,7 @@ ggplot(data = graph_data_test_highlight, aes(x = str_ym_date, y = mean_k, fill =
        title = "Mean Potassium levels from September 1988 to 1990",
        subtitle = "Potassium spiked sharply during Hurricane Hugo (denoted in red), fell in the following month, rose back up to elevated levels, and then slowly started to return to baseline") + 
   theme(panel.background = element_rect(fill = "white")) +
-  scale_fill_manual(values = c("1"="tomato", "0"="gray" ), guide = FALSE )
+  scale_fill_manual(values = c("1"="tomato", "0"="gray40" ), guide = FALSE )
 ```
 
 
