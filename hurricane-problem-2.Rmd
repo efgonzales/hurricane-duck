@@ -1,0 +1,188 @@
+---
+title: "Lewis Hurricane Duck"
+output: html_document
+date: "2022-08-25"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+title: "code"
+output: html_document
+date: "2022-08-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(janitor)
+library(here)
+library(patchwork)
+```
+
+
+```{r}
+# reading in the data 
+bq1 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca1-Bisley.csv"), na = "-9999", show_col_types = FALSE) %>%
+  clean_names() %>% 
+  mutate(site = "BQ1")
+
+bq2 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca2-Bisley.csv"), na = "-9999", show_col_types = FALSE) %>%
+  clean_names()%>% 
+  mutate(site = "BQ2")
+
+bq3 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca3-Bisley.csv"), na = "-9999", show_col_types = FALSE) %>%
+  clean_names() %>% 
+  mutate(site = "BQ3")
+
+prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "RioMameyesPuenteRoto.csv"), na = "-9999",  show_col_types = FALSE) %>%
+  clean_names()%>% 
+  mutate(site = "PRM")
+
+
+
+lef_table <- bind_rows(bq1, bq2, bq3, prm) %>%
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>%
+  mutate(str_my = paste(year, month)) %>%
+  mutate(str_ym_date = lubridate::ym(str_my)) %>%
+  mutate(no3_n = as.numeric(no3_n)) %>%
+  mutate(k = as.numeric(k)) %>%
+  select(sample_date, sample_id, sample_time, no3_n, k, year, month, site, str_ym_date)
+```
+
+```{r}
+
+lef_table_subset_sept <- lef_table %>%
+  filter(str_ym_date > '1989-8-01' & str_ym_date < '1990-10-01') 
+  
+graph_data <- lef_table_subset_sept %>%
+  group_by(str_ym_date) %>%
+  summarise(mean_k = mean(k, na.rm = TRUE),
+            mean_no_3 = mean(no3_n, na.rm = TRUE))
+
+
+ggplot(data = graph_data, aes(x = str_ym_date, y = mean_k)) + 
+  geom_bar()
+```
+
+
+
+all_sites_select_years <- full_join(q1_tidy, q2_tidy) |> 
+  full_join(q3_tidy) |> 
+  full_join(prm_tidy) |> 
+  filter(year >= 1987,
+         year <= 1995)
+
+all_sites_select_years |> 
+  unite()
+
+
+all_sites_select_years |> 
+  group_by(month, year, sample_id) |> 
+  summarize(mean_k = mean(k, na.rm = TRUE))
+
+
+
+
+ggplot(data = all_sites_select_years, aes(x = sample_date, y = k)) +
+  geom_line(aes(color = sample_id))
+
+
+
+
+ggplot(data = ___, aes(x = ym, y = k)) +
+  geom_bar() +
+  facet_grid(~site)
+```
+
+
+
+# Victoria Code Chunk
+
+```{r}
+
+```
+
+
+
+# Wade Code Chunk
+
+```{r}
+
+# Changing class of date to dateTime
+
+q1_ws <- q1 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  mutate(k = as.numeric(k)) %>%
+  mutate(no3_n = as.numeric(no3_n)) %>%
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+q2_ws <- q2 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  mutate(k = as.numeric(k)) %>%
+  mutate(no3_n = as.numeric(no3_n)) %>%
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+
+q3_ws <- q3 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>%
+  mutate(month = lubridate::month(sample_date)) %>% 
+  mutate(k = as.numeric(k)) %>%
+  mutate(no3_n = as.numeric(no3_n)) %>%
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+
+prm_ws <- prm %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  mutate(k = as.numeric(k)) %>%
+  mutate(no3_n = as.numeric(no3_n)) %>%
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+
+joined_data <- q1_ws %>% 
+  full_join(q2_ws) %>% 
+  full_join(q3_ws) %>% 
+  full_join(prm_ws)
+
+summarised_data <- joined_data %>% 
+  group_by(sample_id, year) %>% 
+  summarise(mean_no3 = mean(no3_n, na.rm = TRUE),
+            mean_k = mean(k, na.rm = TRUE))
+
+
+no3 <- ggplot(data = summarised_data, aes(x = year, y = mean_no3)) +
+  geom_line(aes(color = sample_id)) +
+  geom_vline(xintercept = (1989))
+
+k <- ggplot(data = summarised_data, aes(x = year, y = mean_k)) +
+  geom_line(aes(color = sample_id)) +
+  geom_vline(xintercept = (1989))
+
+
+
+joined_sites_mean <- joined_data %>% 
+  group_by(sample_id, year) %>% 
+  summarize(mean_k = mean(k, na.rm = TRUE),
+            mean_no3 = mean(no3_n, na.rm = TRUE))
+
+
+
+
+(no3 / k)
+
+```
+
+
+
