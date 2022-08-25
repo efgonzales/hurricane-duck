@@ -31,6 +31,37 @@ prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "Ri
 
 ```{r}
 
+bq1 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca1-Bisley.csv"), na = "-9999", show_col_types = FALSE) %>%
+  clean_names() %>% 
+  mutate(site = "BQ1")
+
+bq2 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca2-Bisley.csv"), na = "-9999", show_col_types = FALSE) %>%
+  clean_names()%>% 
+  mutate(site = "BQ2")
+
+bq3 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca3-Bisley.csv"), na = "-9999", show_col_types = FALSE) %>%
+  clean_names() %>% 
+  mutate(site = "BQ3")
+
+prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "RioMameyesPuenteRoto.csv"), na = "-9999",  show_col_types = FALSE) %>%
+  clean_names()%>% 
+  mutate(site = "PRM")
+
+
+
+lef_table <- bind_rows(bq1, bq2, bq3, prm) %>%
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>%
+  mutate(no3_n = as.numeric(no3_n)) %>%
+  mutate(k = as.numeric(k)) %>%
+  select(sample_date, sample_id, sample_time, no3_n, k, year, month, site)
+
+
+
+
+
+
 ```
 
 
@@ -46,7 +77,53 @@ prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "Ri
 # Lewis Code Chunk
 
 ```{r}
+# Changing class of date to dateTime
 
+
+
+q1_tidy <- q1 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>%
+  mutate(k = as.numeric(k))
+
+q2_tidy <- q2 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>%
+  mutate(k = as.numeric(k))
+
+
+q3_tidy <- q3 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>%
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>%
+  mutate(k = as.numeric(k))
+
+prm_tidy <- prm %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>%
+  mutate(k = as.numeric(k))
+
+all_sites_select_years <- full_join(q1_tidy, q2_tidy) |> 
+  full_join(q3_tidy) |> 
+  full_join(prm_tidy) |> 
+  filter(year >= 1987,
+         year <= 1995) |>
+  mutate(month_year = lubridate::ym(sample_date))
+
+all_sites_select_years |> 
+  group_by(month, year, sample_id) |> 
+  summarize(mean_k = mean(k, na.rm = TRUE))
+
+
+ggplot(data = all_sites_select_years, aes(x = sample_date, y = k)) +
+  geom_line(aes(color = sample_id))
 ```
 
 
