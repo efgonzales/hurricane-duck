@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(janitor)
 library(here)
+library(patchwork)
 
 q1 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca1-Bisley.csv"), na = "-9999") %>%
   clean_names()
@@ -65,18 +66,31 @@ all_sites <- full_join(prm, q1) %>% full_join(q2) %>% full_join(q3) %>%
   filter(year >= 1988 & year <= 1995) %>% 
   mutate(k = as.numeric(k)) %>% 
   mutate(no3_n = as.numeric(no3_n)) %>% 
-  #mutate(month_year = lubridate::my)
-  pivot_longer('no3_n':'k', names_to = "measurement_type", values_to = "measurement_value") %>% 
-  group_by(sample_id, month, year, measurement_type) %>% summarize(mean_val = mean(measurement_value, na.rm = TRUE))
+  mutate(str_my = paste(year, month)) %>% 
+  mutate(str_ym_date = lubridate::ym(str_my)) %>% 
+  #pivot_longer('no3_n':'k', names_to = "measurement_type", values_to = "measurement_value") %>% 
+  group_by(sample_id, str_ym_date) %>% summarize(mean_no3_n = mean(no3_n, na.rm = TRUE),
+                                                 mean_k = mean(k, na.rm = TRUE))
 
   #mutate(yearmonth = lubridate::ym(sample_date)) %>% 
   #
 
 # plot data 
 
-ggplot(data = all_sites, mapping = aes(x = sample_date, y = mean_val)) +
-  geom_line(aes(color = sample_id)) +
-  facet_wrap(vars(measurement_type), scales = "free")
+no3_n_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_no3_n)) +
+  geom_line(aes(color = sample_id)) 
+#+
+  #facet_wrap(vars(measurement_type), scales = "free")
+
+no3_n_plot
+
+k_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_k)) +
+  geom_line(aes(color = sample_id)) 
+
+k_plot
+
+(k_plot / no3_n_plot)
+
 ```
 
 
