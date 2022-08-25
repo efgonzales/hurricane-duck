@@ -155,7 +155,9 @@ all_sites <- full_join(prm, q1) %>% full_join(q2) %>% full_join(q3) %>%
 # plot data 
 
 no3_n_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_no3_n)) +
-  geom_line(aes(color = sample_id)) 
+  geom_line(aes(color = sample_id)) +
+  labs(x = "Mean K () per Month",
+       y = )
 #+
   #facet_wrap(vars(measurement_type), scales = "free")
 
