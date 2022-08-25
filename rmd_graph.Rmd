@@ -55,16 +55,27 @@ prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "Ri
 ```{r}
 
 library(tidyverse)
+library(lubridate)
 # wrangle data
 
-  # join all sites
+all_sites <- full_join(prm, q1) %>% full_join(q2) %>% full_join(q3) %>% 
+  mutate(year = lubridate::year(sample_date)) %>%  # let's isolate the year for our graph
+  mutate(month = lubridate::month(sample_date)) %>% # let's isolate the month just in case we want it later for further analysis
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>% 
+  filter(year >= 1988 & year <= 1995) %>% 
+  mutate(k = as.numeric(k)) %>% 
+  mutate(no3_n = as.numeric(no3_n)) %>% 
+  pivot_longer('no3_n':'k', names_to = "measurement_type", values_to = "measurement_value") %>% 
+  group_by(sample_id, sample_date, measurement_type) %>% summarize(mean_val = mean(measurement_value, na.rm = TRUE))
 
-all_sites <- full_join(prm, q1) %>% 
-  full_join(q2) %>% 
-  full_join(q3)
+  #mutate(yearmonth = lubridate::ym(sample_date)) %>% 
+  #
 
 # plot data 
 
+ggplot(data = all_sites, mapping = aes(x = sample_date, y = mean_val)) +
+  geom_line(aes(color = sample_id)) +
+  facet_wrap(vars(measurement_type), scales = "free")
 ```
 
 
