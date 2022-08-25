@@ -12,6 +12,7 @@ library(lubridate)
 library(patchwork)
 library(janitor)
 library(here)
+library(plotly)
 ```
 
 ## Read in the Data
@@ -69,7 +70,7 @@ k_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_k)) +
   geom_line(aes(color = sample_id)) +
   labs(x = "Year",
        y = "Mean NO3-N (ug/L) per Month",
-      title = "The Effect of Hurricane Hugo on Mean K and NO3-N (ug/L) levels") + 
+      title = "The Effect of Hurricane Hugo on Mean K and NO3-N Levels") + 
   scale_color_discrete(name="Site Name") +
   geom_vline(xintercept = lubridate::ymd("1989-09-01"), linetype="dotted") +
   geom_text(aes(x=lubridate::ymd("1989-07-01"), label="Hurricane Hugo", y=0), color="black", size = 3)

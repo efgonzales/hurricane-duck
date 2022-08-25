@@ -31,37 +31,6 @@ prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "Ri
 
 ```{r}
 
-bq1 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca1-Bisley.csv"), na = "-9999", show_col_types = FALSE) %>%
-  clean_names() %>% 
-  mutate(site = "BQ1")
-
-bq2 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca2-Bisley.csv"), na = "-9999", show_col_types = FALSE) %>%
-  clean_names()%>% 
-  mutate(site = "BQ2")
-
-bq3 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca3-Bisley.csv"), na = "-9999", show_col_types = FALSE) %>%
-  clean_names() %>% 
-  mutate(site = "BQ3")
-
-prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "RioMameyesPuenteRoto.csv"), na = "-9999",  show_col_types = FALSE) %>%
-  clean_names()%>% 
-  mutate(site = "PRM")
-
-
-
-lef_table <- bind_rows(bq1, bq2, bq3, prm) %>%
-  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
-  mutate(year = lubridate::year(sample_date)) %>% 
-  mutate(month = lubridate::month(sample_date)) %>%
-  mutate(no3_n = as.numeric(no3_n)) %>%
-  mutate(k = as.numeric(k)) %>%
-  select(sample_date, sample_id, sample_time, no3_n, k, year, month, site)
-
-
-
-
-
-
 ```
 
 
@@ -70,6 +39,43 @@ lef_table <- bind_rows(bq1, bq2, bq3, prm) %>%
 
 ```{r}
 
+library(zoo)
+q1_eg <- q1 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+q2_eg <- q2 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+
+q3_eg <- q3 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>%
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+
+prm_eg <- prm %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
+
+join1 <- full_join(q1_eg, q2_eg)
+join2 <- full_join(join1, q3_eg)
+all_sites <- full_join(join2, prm_eg) |> 
+  mutate(no3_n = as.numeric(no3_n))
+  
+summary_all <- all_sites |> group_by(sample_id, month, year, na.rm = TRUE) |> summarize(mean_no3_n = mean(no3_n)) |> 
+  mutate(date = as.yearmon(paste(summary_all$year, summary_all$month, "%Y %m")))
+
+ggplot(data = summary_all, aes(x = year, y = mean_no3_n)) +
+  geom_line(aes(line = sample_id))
 ```
 
 
@@ -78,9 +84,6 @@ lef_table <- bind_rows(bq1, bq2, bq3, prm) %>%
 
 ```{r}
 # Changing class of date to dateTime
-
-
-
 q1_tidy <- q1 %>% 
   mutate(sample_date = lubridate::ymd(sample_date)) %>% 
   mutate(year = lubridate::year(sample_date)) %>% 
@@ -94,6 +97,7 @@ q2_tidy <- q2 %>%
   mutate(month = lubridate::month(sample_date)) %>% 
   select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>%
   mutate(k = as.numeric(k))
+
 
 
 q3_tidy <- q3 %>% 
@@ -124,51 +128,26 @@ all_sites_select_years |>
 
 ggplot(data = all_sites_select_years, aes(x = sample_date, y = k)) +
   geom_line(aes(color = sample_id))
-```
 
 
 
-# Victoria Code Chunk
 
-```{r}
-
-library(tidyverse)
-library(lubridate)
-# wrangle data
-
-all_sites <- full_join(prm, q1) %>% full_join(q2) %>% full_join(q3) %>% 
-  mutate(year = lubridate::year(sample_date)) %>%  # let's isolate the year for our graph
-  mutate(month = lubridate::month(sample_date)) %>% # let's isolate the month just in case we want it later for further analysis
-  select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>% 
-  filter(year >= 1988 & year <= 1995) %>% 
-  mutate(k = as.numeric(k)) %>% 
-  mutate(no3_n = as.numeric(no3_n)) %>% 
-  mutate(str_my = paste(year, month)) %>% 
-  mutate(str_ym_date = lubridate::ym(str_my)) %>% 
-  #pivot_longer('no3_n':'k', names_to = "measurement_type", values_to = "measurement_value") %>% 
-  group_by(sample_id, str_ym_date) %>% summarize(mean_no3_n = mean(no3_n, na.rm = TRUE),
-                                                 mean_k = mean(k, na.rm = TRUE))
-
-  #mutate(yearmonth = lubridate::ym(sample_date)) %>% 
-  #
-
-# plot data 
-
+<<<<<<< HEAD
 no3_n_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_no3_n)) +
   geom_line(aes(color = sample_id)) +
   labs(x = "Mean K () per Month",
        y = )
 #+
   #facet_wrap(vars(measurement_type), scales = "free")
+=======
+```
+>>>>>>> b44332e56746a8cb73efef55902d4a9ac5a553e5
 
-no3_n_plot
 
-k_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_k)) +
-  geom_line(aes(color = sample_id)) 
 
-k_plot
+# Victoria Code Chunk
 
-(k_plot / no3_n_plot)
+```{r}
 
 ```
 
@@ -184,29 +163,67 @@ q1_ws <- q1 %>%
   mutate(sample_date = lubridate::ymd(sample_date)) %>% 
   mutate(year = lubridate::year(sample_date)) %>% 
   mutate(month = lubridate::month(sample_date)) %>% 
-  select(sample_date, sample_time, no3_n, k, year, month)
+  mutate(k = as.numeric(k)) %>%
+  mutate(no3_n = as.numeric(no3_n)) %>%
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
 
 q2_ws <- q2 %>% 
   mutate(sample_date = lubridate::ymd(sample_date)) %>% 
   mutate(year = lubridate::year(sample_date)) %>% 
   mutate(month = lubridate::month(sample_date)) %>% 
-  select(sample_date, sample_time, no3_n, k, year, month)
+  mutate(k = as.numeric(k)) %>%
+  mutate(no3_n = as.numeric(no3_n)) %>%
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
 
 
 q3_ws <- q3 %>% 
   mutate(sample_date = lubridate::ymd(sample_date)) %>% 
   mutate(year = lubridate::year(sample_date)) %>%
   mutate(month = lubridate::month(sample_date)) %>% 
-  select(sample_date, sample_time, no3_n, k, year, month)
+  mutate(k = as.numeric(k)) %>%
+  mutate(no3_n = as.numeric(no3_n)) %>%
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
 
 
 prm_ws <- prm %>% 
   mutate(sample_date = lubridate::ymd(sample_date)) %>% 
   mutate(year = lubridate::year(sample_date)) %>% 
   mutate(month = lubridate::month(sample_date)) %>% 
-  select(sample_date, sample_time, no3_n, k, year, month)
+  mutate(k = as.numeric(k)) %>%
+  mutate(no3_n = as.numeric(no3_n)) %>%
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month)
 
 
+joined_data <- q1_ws %>% 
+  full_join(q2_ws) %>% 
+  full_join(q3_ws) %>% 
+  full_join(prm_ws)
+
+summarised_data <- joined_data %>% 
+  group_by(sample_id, year) %>% 
+  summarise(mean_no3 = mean(no3_n, na.rm = TRUE),
+            mean_k = mean(k, na.rm = TRUE))
+
+
+no3 <- ggplot(data = summarised_data, aes(x = year, y = mean_no3)) +
+  geom_line(aes(color = sample_id)) +
+  geom_vline(xintercept = (1989))
+
+k <- ggplot(data = summarised_data, aes(x = year, y = mean_k)) +
+  geom_line(aes(color = sample_id)) +
+  geom_vline(xintercept = (1989))
+
+
+
+joined_sites_mean <- joined_data %>% 
+  group_by(sample_id, year) %>% 
+  summarize(mean_k = mean(k, na.rm = TRUE),
+            mean_no3 = mean(no3_n, na.rm = TRUE))
+
+
+
+
+(no3 / k)
 
 ```
 
