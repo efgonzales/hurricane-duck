@@ -57,16 +57,17 @@ all_sites <- full_join(prm, q1) %>% full_join(q2) %>% full_join(q3) %>% # full j
 
 ```{r}
 
+# graph of the nitrate nitrogen over time
 no3_n_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_no3_n)) +
   geom_line(aes(color = sample_id)) +
   labs(x = "Year",
        y = "Mean Potassium (mg/L) per Month") + 
   scale_color_discrete(name="Site Name") +
-  geom_vline(xintercept = lubridate::ymd("1989-09-01"), linetype="dotted") + # add a dotted line when the hurricane was (days are all "01")
+  geom_vline(xintercept = lubridate::ymd("1989-09-01"), linetype="dotted") + # add a dotted line when the hurricane was (days are all "01" in our data)
   geom_text(aes(x=lubridate::ymd("1989-07-01"), label="Hurricane Hugo", y=0), color="black", size = 3) +
   theme_minimal()
   
-
+# graph of the potassium over time using the same methodology as above. adding the title and subtitle here since we will print this plot over the other plot
 k_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_k)) +
   geom_line(aes(color = sample_id)) +
   labs(x = "Year",
@@ -78,11 +79,11 @@ k_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_k)) +
   geom_text(aes(x=lubridate::ymd("1989-07-01"), label="Hurricane Hugo", y=0), color="black", size = 3) +
   theme_minimal()
 
-(k_plot / no3_n_plot)
+(k_plot / no3_n_plot) # get the plots on top of each other
 ```
 
 ## Save the Plot
 
 ```{r}
-ggsave("hurricane_hugo.png")
+# take a screenshot of zoomed plot
 ```
