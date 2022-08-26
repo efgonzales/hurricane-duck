@@ -1,14 +1,4 @@
 ---
-title: "Lewis Hurricane Duck"
-output: html_document
-date: "2022-08-25"
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
----
 title: "code"
 output: html_document
 date: "2022-08-24"
@@ -17,16 +7,30 @@ date: "2022-08-24"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-#loading the libraries
 library(tidyverse)
 library(janitor)
 library(here)
 library(patchwork)
+
+q1 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca1-Bisley.csv"), na = "-9999") %>%
+  clean_names()
+
+q2 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca2-Bisley.csv"), na = "-9999") %>%
+  clean_names()
+
+q3 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca3-Bisley.csv"), na = "-9999") %>%
+  clean_names()
+
+prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "RioMameyesPuenteRoto.csv"), na = "-9999") %>%
+  clean_names()
 ```
 
 
+
+# Ata Code Chunk
+
 ```{r}
-# reading in the data 
+
 bq1 <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "QuebradaCuenca1-Bisley.csv"), na = "-9999", show_col_types = FALSE) %>%
   clean_names() %>% 
   mutate(site = "BQ1")
@@ -44,42 +48,67 @@ prm <- read_csv(here("/courses", "EDS214", "hurricaneducks", "raw_data_all", "Ri
   mutate(site = "PRM")
 
 
+
 lef_table <- bind_rows(bq1, bq2, bq3, prm) %>%
   mutate(sample_date = lubridate::ymd(sample_date)) %>% 
   mutate(year = lubridate::year(sample_date)) %>% 
   mutate(month = lubridate::month(sample_date)) %>%
-  mutate(str_my = paste(year, month)) %>%
-  mutate(str_ym_date = lubridate::ym(str_my)) %>%
   mutate(no3_n = as.numeric(no3_n)) %>%
   mutate(k = as.numeric(k)) %>%
-  select(sample_date, sample_id, sample_time, no3_n, k, year, month, site, str_ym_date)
+  select(sample_date, sample_id, sample_time, no3_n, k, year, month, site)
+
+
+
+
+
+
 ```
+
+
+
+# Elise Code Chunk
 
 ```{r}
 
-lef_table_subset_sept <- lef_table %>%
-<<<<<<< HEAD
-  filter(str_ym_date > '1989-8-01' & str_ym_date < '1990-10-01') 
-=======
-  filter(str_ym_date > '1988-8-01' & str_ym_date < '1990-10-01')
->>>>>>> 2fb0cfcafd0fadc019e4775db7c6c082b493910e
-  
-graph_data <- lef_table_subset_sept %>%
-  group_by(str_ym_date) %>%
-  summarise(mean_k = mean(k, na.rm = TRUE),
-            mean_no_3 = mean(no3_n, na.rm = TRUE))
-
-graph_data_test <- lef_table_subset_sept %>%
-  group_by(str_ym_date, site) %>%
-  summarise(mean_k = mean(k, na.rm = TRUE),
-            mean_no_3 = mean(no3_n, na.rm = TRUE)) 
-
-<<<<<<< HEAD
-ggplot(data = graph_data, aes(x = str_ym_date, y = mean_k)) + 
-  geom_bar()
 ```
 
 
+
+# Lewis Code Chunk
+
+```{r}
+# Changing class of date to dateTime
+
+
+
+q1_tidy <- q1 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>%
+  mutate(k = as.numeric(k))
+
+q2_tidy <- q2 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>%
+  mutate(k = as.numeric(k))
+
+
+q3_tidy <- q3 %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>%
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>%
+  mutate(k = as.numeric(k))
+
+prm_tidy <- prm %>% 
+  mutate(sample_date = lubridate::ymd(sample_date)) %>% 
+  mutate(year = lubridate::year(sample_date)) %>% 
+  mutate(month = lubridate::month(sample_date)) %>% 
+  select(sample_id, sample_date, sample_time, no3_n, k, year, month) %>%
+  mutate(k = as.numeric(k))
 
 all_sites_select_years <- full_join(q1_tidy, q2_tidy) |> 
   full_join(q3_tidy) |> 
@@ -100,13 +129,6 @@ all_sites_select_years |>
 
 ggplot(data = all_sites_select_years, aes(x = sample_date, y = k)) +
   geom_line(aes(color = sample_id))
-
-
-
-
-ggplot(data = ___, aes(x = ym, y = k)) +
-  geom_bar() +
-  facet_grid(~site)
 ```
 
 
@@ -191,22 +213,9 @@ joined_sites_mean <- joined_data %>%
 
 (no3 / k)
 
-=======
-graph_data_test_highlight <- graph_data_test %>%
-  group_by(site) %>%
-  mutate(max_k=ifelse(mean_k==max(mean_k), "1", "0"))
-
-ggplot(data = graph_data_test_highlight, aes(x = str_ym_date, y = mean_k, fill = max_k)) + 
-  geom_col() +
-  facet_wrap(~site) +
-  labs(x = "Date",
-       y = "Mean Potassium (K) in mg/L",
-       title = "Mean Potassium levels from September 1988 to 1990",
-       subtitle = "Potassium spiked sharply during Hurricane Hugo (denoted in red), fell in the following month, rose back up to elevated levels, and then slowly started to return to baseline") + 
-  theme(panel.background = element_rect(fill = "white")) +
-  scale_fill_manual(values = c("1"="tomato", "0"="gray40" ), guide = FALSE )
->>>>>>> 2fb0cfcafd0fadc019e4775db7c6c082b493910e
 ```
+
+
 
 
 
