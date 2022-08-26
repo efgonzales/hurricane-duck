@@ -72,7 +72,7 @@ k_plot = ggplot(data = all_sites, mapping = aes(x = str_ym_date, y = mean_k)) +
   geom_line(aes(color = sample_id)) +
   labs(x = "Year",
        y = "Mean Nitrate (ug/L) per Month",
-      title = "Monthly Mean Potassium (mg/L) and Nitrate Nitrogen (ug/L) Levels from 1998 to 1995",
+      title = "Monthly Mean Potassium (mg/L) and Nitrate Nitrogen (ug/L) Levels from 1988 to 1995",
       subtitle = "Potassium and nitrate nitrogen levels spike following the 1989 Hurricane Hugo") + 
   scale_color_discrete(name="Site Name") +
   geom_vline(xintercept = lubridate::ymd("1989-09-01"), linetype="dotted") +
